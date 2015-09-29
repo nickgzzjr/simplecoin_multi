@@ -31,6 +31,17 @@ def home():
                            locations=locations,
                            default_curr=default_curr)
 
+@main.route("/about")
+def about():
+    payout_currencies = currencies.buyable_currencies
+    past_chain_profit = get_past_chain_profit()
+    default_curr = current_app.config['pool_payout_currency']
+    return render_template('about.html',
+                           payout_currencies=payout_currencies,
+                           past_chain_profit=past_chain_profit,
+                           locations=locations,
+                           default_curr=default_curr)
+
 
 @main.route("/configuration_guide")
 def configuration_guide():

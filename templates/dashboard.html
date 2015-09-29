@@ -16,7 +16,7 @@
         </div>
       </header>
       <ul id="main-menu" class="main-menu">
-        <li class="root-level">
+        <li class="{% if active_page == 'about' %}active {% endif %}root-level">
           <a href="/about">
             <i class="about"></i>
             <span>About</span>
@@ -28,19 +28,19 @@
             <span>Get Started</span>
           </a>
         </li>
-        <li class="root-level">
-          <a href="/pool_stats">
+        <li class="{% if active_page == 'stats' %}active {% endif %}root-level">
+          <a href="/stats">
             <i class="stats"></i>
             <span>Stats</span>
           </a>
         </li>
-        <li class="root-level">
+        <li class="{% if active_page == 'pool_stats' %}active {% endif %}root-level">
           <a href="/pool_stats">
             <i class="pool"></i>
             <span>Pool Stats</span>
           </a>
         </li>
-        <li class="root-level">
+        <li class="{% if active_page == 'leaderboard' %}active {% endif %}root-level">
           <a href="/leaderboard">
             <i class="leaderboard"></i>
             <span>Leaderboard</span>
@@ -56,7 +56,9 @@
     </div>
   </div>
   <div class="main-content">
-    {% block dashboard %}{% endblock %}
+    <div class="space">
+      {% block dashboard %}{% endblock %}
+    </div>
     <footer>
       BTC &nbsp; 
        <img width="16" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACFUlEQVRYR81X7VHCQBB9C8zoDCbagViBWoFYgViBWIFaAVqBWIFYgVKBWIFYgdgBXHRGZ5KsswmnEXJywUDM7317L+/24x2h4I9M53O1uoNy+QBEOwA2wNwD8wCe1yVgmIZjiXMcwdRAVIfEMfcRBF16e+unYaYIsOM0UCpdAqgZxWFuQ6kLTSQ62HVbIDr9RdABwvCMPO8uGfODALtuB0RHlrcyhO/vR7GVyn2kks3H3CGljnXoF4GMh2u8vgq7wzUqQSIiMJb91uYHcosJw0O5jpjA+voAwGZuye0SDWg02iJ2nCZKpWs7TM5RYXhM7Lp3IDrIObVdOuYbKkh+TbAvBNiO7mKi/gWBIjpAy/kkCvQA7C1G4BlZmbvSBecgahVE4IKirVepPBZCwPd39SSUVbm9ZBIPNBrVYwJra3WUy7LRlvcFwT69vvaS23B5E1GKT6mG/O03gdXVGlZWnpciwcfHFr2/S/t/Exiv5cUvJllAnteZMiRfXiGbK8ommCwfpZpJUKopXdBwiqp+knE6AfF38YTMqzWfELfclJs22/LY6YpJ/ZtXSJF95hUkA+Y0q3GKGYdPdYGpouaybRPVbsptvIJJwHhnyKNilnl9ge83TC8hqyI0KhHXhWzPk9QY5isodW56uqVhrBX4URfx7pBhotV4QRA0ZbZnGwwTkzArOPISwJCUamfFGifhvInmxX0ChZ7LEcOI/mEAAAAASUVORK5CYII="/>

@@ -67,7 +67,7 @@ generate_graph = function(selector, params, chart_type, controls, typ) {
                     .datum(clean_data)
                     .call(chart);
 
-                selector.find('img').hide()
+                // selector.find('img').hide();
 
                 //Hack to update chart when click event occurs
                 $(".nvd3").on("click", function() {

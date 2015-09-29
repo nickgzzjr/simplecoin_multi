@@ -1,18 +1,15 @@
-{% extends "base.html" %}
-{% set active_page = "stats" %}
-{% set page_title = "Stats - Lookup mining stats for an address" %}
-{% block body %}
+{% extends "dashboard.html" %} {% set active_page = "stats" %} {% set page_title = "Stats" %} {% block dashboard %}
 <script>
 $(document).ready(function() {
   //  Action stats form based on input val
-    $('#statsform').submit(function(){
-      var address = $('#inputAddress').val();
-      $(this).attr('action', "/stats/" + address);
-    });
-    
-    // Handling of removing address
-    $('#statsform').on('click', 'button.close', function() {
-      var jqxhr = $.ajax('/' + $(this).data('address') + '/clear')
+  $('#statsform').submit(function() {
+    var address = $('#inputAddress').val();
+    $(this).attr('action', "/stats/" + address);
+  });
+
+  // Handling of removing address
+  $('#statsform').on('click', 'button.close', function() {
+    var jqxhr = $.ajax('/' + $(this).data('address') + '/clear')
       .always(function(data) {
         // Clear recent list
         $('#recent-users').empty();
@@ -21,44 +18,41 @@ $(document).ready(function() {
         var recent = data.recent;
         $.each(recent, function(index, value) {
           var recentAddress = $('<p>')
-          .append(
-            $('<button>', {type: 'button', class: 'close', 'data-address': value}).html('×')
-          ).append(
-            $('<h4>').append(
-              $('<a>', {href: '/stats/' + value}).html(value)
+            .append(
+              $('<button>', {
+                type: 'button',
+                class: 'close',
+                'data-address': value
+              }).html('×')
+            ).append(
+              $('<h4>').append(
+                $('<a>', {
+                  href: '/stats/' + value
+                }).html(value)
+              )
             )
-          )
           $('#recent-users').append(recentAddress);
         });
       });
-    });
+  });
 });
 </script>
-<h3>{{ _("Aren't mining with us yet? Look at the") }} <a href="/configuration_guide">{{ _("configuration guide.") }}</a></h3>
-<br />
-<div class="form-group">
-  <form class="bs-example form-horizontal" id="statsform">
-    <fieldset>
-      <div class="form-group">
-        <div class="col-lg-9">
-          <input type="text" class="form-control" id="inputAddress" placeholder="{{ _('Paste your User Address for quick access to individualized stats.') }}">
-          <span class="help-block">
-              {% if 'recent_users' in session %}
-                <h4>{{ _("Recently Visited Stats:") }}</h4>
-                <div id="recent-users">
-                {% for address, perc in session['recent_users'] %}
-                  <p>
-                    <button type="button" class="close" data-address="{{ address }}">×</button>
-                    <h4><a style="opacity:{{ perc | fader(0.1, 0.3, 0.4, '0.8', '0.9', '1.0') }};" href="/stats/{{ address }}">{{ address }}</a></h4>
-                  </p>
-                {% endfor %}
-                </div>
-              {% endif %}
-          </span>
-        </div>
-        <button type="submit" class="btn btn-default">{{ _("View Stats") }}</button>
-      </div>
-    </fieldset>
+  <h3>{{ _("Aren't mining with us yet?") }} <a href="/configuration_guide">{{ _("Get started.") }}</a></h3>
+  <form class="form-horizontal" id="statsform">
+    <input type="text" class="form-control" id="inputAddress" placeholder="{{ _('Paste your User Address for quick access to individualized stats.') }}">
+    <button type="submit" class="btn">{{ _("View Stats") }}</button>
   </form>
-</div>
+  <div class="left-padding">
+    {% if 'recent_users' in session %}
+    <h4>{{ _("Recently Visited Stats:") }}</h4>
+    <div id="recent-users">
+      {% for address, perc in session['recent_users'] %}
+      <p>
+        <a style="opacity:{{ perc | fader(0.1, 0.3, 0.4, '0.8', '0.9', '1.0') }};" href="/stats/{{ address }}">{{ address }}</a> &nbsp;
+        <button class="btn btn-small" class="close" data-address="{{ address }}">×</button>
+      </p>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
 {% endblock %}
