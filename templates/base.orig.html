@@ -1,0 +1,129 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="og:image" content="{{ config['assets_address'] | safe }}{{ config['leader-xs'] | safe }}">
+  <title>{{ config['site_title'] | safe }}{% if page_title %} - {{ page_title }}{% endif %}</title>
+  <meta name="description" content="{{ config['site_meta_desc'] | safe }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <link rel="stylesheet" href="{{ config['assets_address'] | safe }}/css/font-awesome-4.1.0.min.css">
+  <link rel="stylesheet" href="{{ config['assets_address'] | safe }}/css/bootstrap-superhero-3.2.min.css">
+  <link rel="stylesheet" href="{{ config['assets_address'] | safe }}/css/main.css?revision={{ config['hash'] }}">
+  <link rel="stylesheet" href="{{ config['assets_address'] | safe }}/css/nv.d3.css?revision={{ config['hash'] }}">
+  <script src="{{ config['assets_address'] | safe }}/js/jquery-2.1.0.min.js"></script>
+  <script>window.jQuery || document.write('<script src="//code.jquery.com/jquery-2.1.0.min.js"><\/script>')</script>
+  <script src="{{ config['assets_address'] | safe }}/js/d3-3.4.2.min.js"></script>
+  <script src="{{ config['assets_address'] | safe }}/js/ZeroClipboard-1.3.3.min.js"></script>
+  <script src="{{ config['assets_address'] | safe }}/js/nv.d3.min.js"></script>
+  <script src="{{ config['assets_address'] | safe }}/js/bootstrap.min.js"></Script>
+  <script src="{{ config['assets_address'] | safe }}/js/jquery.tablesorter.min.js"></Script>
+
+  <script src="{{ config['assets_address'] | safe }}/js/utils.js?revision={{ config['hash'] }}"></script>
+  <script src="{{ config['assets_address'] | safe }}/js/graph.js?revision={{ config['hash'] }}"></Script>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+        <div class="col-md-4 no-padding">
+          <h2 style="font-size:36px;">
+            <a style=" text-decoration:none;" href="/">
+              <div>
+                <img src="{{ config['assets_address'] | safe }}{{ config['logo'] | safe }}" style="padding-bottom: 5px;padding-right:5px;float:left;width:64px;">
+                {{ config['site_title'] | safe }} <span style="color: #B82D2A; font-size: 20pt;">Beta</span>
+              </div>
+            </a>
+          </h2>
+        </div>
+        <div class="col-md-8 no-padding">
+          {% if not no_header %}
+          <h5 class="stats">
+            {% for algo in g.algos %}
+              <div class="col-sm-3">
+                {{ g.algos[algo].display }} {{ _("Status:") }}<br>
+                <strong data-toggle="tooltip" data-placement="right"
+                  title="Total hashrate for the pool, represented in Megahashes per second">&nbsp;{{ _("Hashrate") }}
+                </strong>:&nbsp;{{ g.hashrates[algo] | hashrate }}
+                <br>
+                <strong data-placement="right"
+                  title="Total active clients mining on {{ config['site_name'] | safe }}">
+                  &nbsp;{{ _("Active") }}&nbsp;{{ _("Miners") }}</strong>:&nbsp;{{ g.miner_count.get(algo, 0) }}
+              </div>
+            {% endfor %}
+          </h5>
+          {% endif %}
+        </div>
+    </div>
+    <div class="row">
+      <div class="bs-component">
+        <div class="navbar navbar-default">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div class="navbar-collapse collapse navbar-responsive-collapse">
+          {% for nav in config['navbar'] %}
+            <ul class="nav navbar-nav{% if nav == 'right_nav' %} navbar-right{% endif %}">
+              {% for nl in config['navbar'][nav] %}
+                {% if nl.dropdown %}
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      <i class="fa fa-{{ nl.icon }} too-damn-bright"></i> &nbsp;{{ _(nl.title) }} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      {% for l in nl.dropdown %}
+                      <li><a href="{{ l.link }}"><i class="fa fa-{{ l.icon }} too-damn-bright"></i> &nbsp;{{ _(l.title) }}</a></li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                {% else %}
+                  <li{% if active_page == nl.active_key %} class="active"{% endif %}>
+                    <a href="{{ nl.link }}"><i class="fa fa-{{ nl.icon }} too-damn-bright"></i> &nbsp;{{ _(nl.title) }}</a></li>
+                {% endif %}
+              {% endfor %}
+              {% if nav == 'right_nav' %}
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-cogs too-damn-bright"></i> &nbsp;{{ _('Language') }} <b class="caret"></b></a>
+                <ul class="dropdown-menu" style="width:100%;">
+                {% for lang_id, lang_name in config['available_locales'].iteritems() %}
+                  <li><a href="?lang={{ lang_id }}">{{ lang_name|safe }} {% if session['lang'] == lang_id %}&nbsp;&nbsp;<i class="fa fa-check too-damn-bright"></i>{% endif %}</a></li>
+                {% endfor %}
+                </ul>
+              </li>
+              {% endif %}
+            </ul>
+          {% endfor %}
+          </div>
+        </div>
+      <div id="source-button" class="btn btn-primary btn-xs" style="display: none;">&lt; &gt;</div>
+      </div>
+    </div>
+
+  <!-- Alerts ================================================== -->
+  {% if g.alerts  %}
+    {% for alert in g.alerts %}
+    {# Check to see if the alert has been dismissed by the user #}
+    {% if not alert['key'] in session['dismissed_alerts'] and alert['notify'] == 'all' %}
+    <div data-alert-id={{ alert['key'] }} class="alert alert-dismissable alert-{{ alert['severity'] }}">
+      <button type="button" class="close" data-dismiss="alert" >×</button>
+      <h4{% if not alert['body'] %} style="margin-bottom:0px;"{% endif %}>
+        {{ alert['title']|safe }} -
+        <span class="text-muted small" style="color:#fff;">
+          {{ alert['date'] }}
+        </span>
+      </h4>
+      <p>{{ alert['body']|safe }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% block body %}
+
+  {% endblock %}
+  </div>
+</body>
+</html>

@@ -1,17 +1,13 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
 {% set active_page = "home" %}
-{% set page_title = "Home - A multipool with no registration, and simple currency conversion" %}
 {% block body %}
-
-<div class="row" style="padding-bottom:10px;">
-  <div class="col-sm-5">
-    {% include "homepage_blocks/pool_details.html" %}
-    {% include "homepage_blocks/payout_currencies.html" %}
-    {% include "homepage_blocks/payout_convert_info.html" %}
-  </div>
-
-  {% include "homepage_blocks/quick_start.html" %}
-  {% include "configuration_guide.html" %}
-  {% include "homepage_blocks/features.html" %}
+<div class="middle">
+  <h1 id="glitch" class="glitch" data-text="nPool">nPool</h1>
+  <p>
+  	{{ config['site_meta_desc'] | safe }}
+  </p>
+  <a href="/configuration_guide" class="btn">Get Started</a>
 </div>
+<canvas id="particles"></canvas>
+<script src="{{ config['assets_address'] | safe }}/js/particles.js"></script>
 {% endblock %}
