@@ -77,12 +77,7 @@ Chedda
 ---------------
 If you feel so inclined, you can give back to the devs:
 
-DOGE DAbhwsnEq5TjtBP5j76TinhUqqLTktDAnD
-
-BTC 185cYTmEaTtKmBZc8aSGCr9v2VCDLqQHgR
-
-VTC VkbHY8ua2TjxdL7gY2uMfCz3TxMzMPgmRR
-
+BTC 1HgDYmWYjHH6NicH6PUpY7Bia7CaYsJn1C
 
 Credits
 ---------------
@@ -93,3 +88,4 @@ to those who have contributed:
 
 * [sigwo](https://github.com/sigwo)
 * [sbwdlihao](https://github.com/sbwdlihao)
+* [nickgzzjr](https://github.com/nickgzzjr)
