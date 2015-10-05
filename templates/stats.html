@@ -19,40 +19,38 @@ $(document).ready(function() {
         $.each(recent, function(index, value) {
           var recentAddress = $('<p>')
             .append(
+              $('<a>', {
+                href: '/stats/' + value
+              }).html(value)
+            )
+            .append(
               $('<button>', {
                 type: 'button',
-                class: 'close',
+                class: 'btn btn-small close',
                 'data-address': value
-              }).html('×')
-            ).append(
-              $('<h4>').append(
-                $('<a>', {
-                  href: '/stats/' + value
-                }).html(value)
-              )
-            )
+              }).html('×'));
           $('#recent-users').append(recentAddress);
         });
       });
   });
 });
 </script>
-  <h3>{{ _("Aren't mining with us yet?") }} <a href="/configuration_guide">{{ _("Get started.") }}</a></h3>
-  <form class="form-horizontal" id="statsform">
-    <input type="text" class="form-control" id="inputAddress" placeholder="{{ _('Paste your User Address for quick access to individualized stats.') }}">
-    <button type="submit" class="btn">{{ _("View Stats") }}</button>
-  </form>
+<h3>{{ _("Aren't mining with us yet?") }} <a href="/configuration_guide">{{ _("Get started.") }}</a></h3>
+<form class="form-horizontal" id="statsform">
+  <input type="text" class="form-control" id="inputAddress" placeholder="{{ _('Paste your User Address for quick access to individualized stats.') }}">
+  <button type="submit" class="btn">{{ _("View Stats") }}</button>
+  {% if 'recent_users' in session %}
   <div class="left-padding">
-    {% if 'recent_users' in session %}
     <h4>{{ _("Recently Visited Stats:") }}</h4>
     <div id="recent-users">
       {% for address, perc in session['recent_users'] %}
       <p>
         <a style="opacity:{{ perc | fader(0.1, 0.3, 0.4, '0.8', '0.9', '1.0') }};" href="/stats/{{ address }}">{{ address }}</a> &nbsp;
-        <button class="btn btn-small" class="close" data-address="{{ address }}">×</button>
+        <button type="button" class="btn btn-small close" data-address="{{ address }}">×</button>
       </p>
       {% endfor %}
     </div>
-    {% endif %}
   </div>
+  {% endif %}
+</form>
 {% endblock %}

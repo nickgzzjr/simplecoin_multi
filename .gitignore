@@ -1,6 +1,5 @@
 *.sqlite*
-!defaults.toml
-!example.toml
+defaults.toml
 *.yml
 *.toml
 *.log
@@ -56,5 +55,7 @@ nosetests.xml
 .sass-cache
 tags
 celerybeat-schedule
+
+example.toml
 
 doc/_build/
