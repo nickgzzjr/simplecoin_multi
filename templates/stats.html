@@ -1,0 +1,56 @@
+{% extends "dashboard.html" %} {% set active_page = "stats" %} {% set page_title = "Stats" %} {% block dashboard %}
+<script>
+$(document).ready(function() {
+  //  Action stats form based on input val
+  $('#statsform').submit(function() {
+    var address = $('#inputAddress').val();
+    $(this).attr('action', "/stats/" + address);
+  });
+
+  // Handling of removing address
+  $('#statsform').on('click', 'button.close', function() {
+    var jqxhr = $.ajax('/' + $(this).data('address') + '/clear')
+      .always(function(data) {
+        // Clear recent list
+        $('#recent-users').empty();
+
+        // Build updated recent list
+        var recent = data.recent;
+        $.each(recent, function(index, value) {
+          var recentAddress = $('<p>')
+            .append(
+              $('<a>', {
+                href: '/stats/' + value
+              }).html(value)
+            )
+            .append(
+              $('<button>', {
+                type: 'button',
+                class: 'btn btn-small close',
+                'data-address': value
+              }).html('×'));
+          $('#recent-users').append(recentAddress);
+        });
+      });
+  });
+});
+</script>
+<h3>{{ _("Aren't mining with us yet?") }} <a href="/configuration_guide">{{ _("Get started.") }}</a></h3>
+<form class="form-horizontal" id="statsform">
+  <input type="text" class="form-control" id="inputAddress" placeholder="{{ _('Paste your User Address for quick access to individualized stats.') }}">
+  <button type="submit" class="btn">{{ _("View Stats") }}</button>
+  {% if 'recent_users' in session %}
+  <div class="left-padding">
+    <h4>{{ _("Recently Visited Stats:") }}</h4>
+    <div id="recent-users">
+      {% for address, perc in session['recent_users'] %}
+      <p>
+        <a style="opacity:{{ perc | fader(0.1, 0.3, 0.4, '0.8', '0.9', '1.0') }};" href="/stats/{{ address }}">{{ address }}</a> &nbsp;
+        <button type="button" class="btn btn-small close" data-address="{{ address }}">×</button>
+      </p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}

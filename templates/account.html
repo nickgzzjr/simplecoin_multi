@@ -1,0 +1,12 @@
+{% extends "dashboard.html" %}
+{% set active_page = "stats" %}
+{% set page_title = "Account Details - Historical payout list" %}
+{% block dashboard %}
+
+<br />
+{% include table %}
+<ul class="pager">
+  <li class="previous {% if not page %}disabled{% endif %}"><a href="?page={{ page - 1 }}">&larr; {{ _("Newer") }}</a></li>
+  <li class="next"><a href="?page={{ page + 1 }}">{{ _("Older") }} &rarr;</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "dashboard.html" %} {% set active_page = "stats" %} {% set page_title = 'User Stats' %} {% block dashboard %}
+<script>
+$(document).ready(function() {
+  generate_graph($('#chart'), {
+    address: '{{ username }}'
+  });
+});
+</script>
+{# We only want to display user level alerts here #} {% if g.alerts %} {% for alert in g.alerts %} {% if alert['notify'] == username %}
+<div data-alert-id={{ alert[ 'key'] }} class="alert alert-dismissable alert-{{ alert['severity'] }}">
+  <h4{% if not alert[ 'body'] %} style="margin-bottom:0px;" {% endif %}>
+    {{ alert['title']|safe }} -
+    <span class="text-muted small" style="color:#fff;">
+        {{ alert['date'] }}
+      </span>
+    </h4>
+    <p>{{ alert['body'] | safe }}</p>
+</div>
+{% endif %} {% endfor %} {% endif %}
+<h2>{{ _("User Stats") }} - {{ username }} </h2> {% for curr, name, merged_addr in merged_addrs %}
+<span style="padding-left:15px;">{{ _("Merge mining %(name)s payout address", name=name) }} : {{ merged_addr }}
+    <a style="color:gray;" href="/set_merge/{{ username }}/{{ curr }}"><i class="fa fa-edit" ></i></a>
+  </span>
+<br> {% endfor %}
+<a href="/settings/{{ username }}">
+{{ _("Edit account settings") }}.
+</a>
+<h2>{{ _("Worker Hashrates") }}</h2>
+<div id="chart">
+  <ul class="tabs">
+    <li class="tab hour"><a>{{ _("Hour") }}</a></li>
+    <li class="tab day"><a>{{ _("Day") }}</a></li>
+    <li class="tab month"><a>{{ _("Month") }}</a></li>
+  </ul>
+  <div style="height:300px;">
+    <svg></svg>
+  </div>
+</div>
+{% if workers %}
+<h2>{{ _("Worker Status") }}</h2>
+{% for worker in workers %}
+<div class="panel">
+  <div class="panel-heading">
+    <i class="circle" style="background:{% if worker['online'] %}#5BCE00{% else %}#B12627{% endif %}" title="{% if worker['online'] %}Online{% else %}Offline{% endif %}"></i>&nbsp; {{ worker['name'] }} <small>({{ worker['algo'] }})</small> {% for server, connections in worker['servers'].iteritems() %} &nbsp;&nbsp;
+    <small style="font-size:8pt;">{{ server.display_text }} ({{ connections }} connections)</small> {% endfor %}
+    <span class="pull-right">
+      <small class="text-right">
+        {{ _("Hashrate") }}: {{ worker['last_10_shares'].hashrate() | hashrate }}
+      </small>
+      <small class="text-right" style="padding-left:10px;font-weight:300;">
+        {{ _("Efficiency") }}: {{ worker['total_shares'].efficiency | round(2) }}%
+      </small>
+    </span>
+  </div>
+  <div class="panel-body">
+    <div class="text-center">
+      <h4>{{ _("Accepted Shares") }}: {{ '{:,}'.format(worker['total_shares'].accepted) }}</h4>
+      <h4>{{ _("Rejected Shares") }}: {{ '{:,}'.format(worker['total_shares'].rejected) }}</h4>
+    </div>
+    {% if worker['status'] %} {% set stat = worker['status'] %}
+      <b>{{ stat['type'] }} {{ _("status") }}</b>
+      {% if not worker['name'] %} {# Show a warning about unnamed workers #}
+      <small>{{ _("Multiple unnamed workers will do wonky things!") }}</small>
+      {% endif %} 
+      <small>{{ _("Updated") }} {{ worker['status_time'] | human_date_utc }}</small>
+      <div id="worker-{{ worker['name'] }}">
+        <div class="text-center">
+          <h4>WU: {{ worker['wu'] | round(2) }}</h4>
+          <h4>{{ worker['total_hashrate'] | hashrate }}</h4>
+          <h4>
+            {% if worker['wue'] < 0.80 %}
+            <i class="circle" style="background:red"></i>
+            {% elif (worker['wue'] < 0.87) and (worker['wue'] >= 0.80) %}
+            <i class="circle" style="background:yellow"></i>
+            {% elif worker['wue'] >= 0.87 %}
+            <i class="circle" style="background:green"></i>
+            {% endif %}
+            WUE: {{ (worker['wue']*100)| round(2)}}%
+          </h4>
+          <h4><a href="/{{ username }}/{{ worker['name'] }}">{{ _("Detailed view") }}</a></h4>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover worker-table">
+            <thead>
+              <tr>
+                <th>{{ _("GPU") }}</th>
+                <th>{{ _("KHash/sec") }}</th>
+                <th>{{ _("WUE") }}</th>
+                <th>{{ _("Accepted/Rejected(%)") }}</th>
+                <th>{{ _("HW Errors") }}</th>
+                <th>{{ _("Temperature") }}</th>
+                <th>{{ _("Fan Speed") }}</th>
+                <th>{{ _("Core/Memory Clock") }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for gpu in stat['gpus'] %}
+              <tr class="gpu" data-url="/{{ username }}/{{ worker['name'] }}/details/{{ loop.index0 }}">
+                <th>{{ loop.index0 }}</th>
+                <th>
+                  {{ (gpu.get('MHS av', 0)*1000)|round|int }}
+                </th>
+                <th>
+                  {% set accepted = gpu.get('Difficulty Accepted', 0) %} {% if accepted != 0 and gpu.get('Device Elapsed', 0) !=0 %} {% set WU = (accepted / gpu['Device Elapsed'])*60 %} {% else %} {% set WU = 0 %} {% endif %} {% if WU == 0 or (gpu.get('MHS av', 0.0001) == 0) %} -/- {% else %} {{ ( (WU / (gpu.get('MHS av', 0.0001)*1000) ) * 100 ) | round(1) }}% {% endif %}
+                </th>
+                <th>
+                  {{ '{:,}'.format(accepted|int) }} / {{ '{:,}'.format(gpu.get('Difficulty Rejected', 0)|int) }} {% if accepted != 0 %} &nbsp;({{ (((accepted - gpu.get('Difficulty Rejected', 0)) / accepted)*100)|round(2) }}%) {% else %} (0) {% endif %}
+                </th>
+                <th>{{ gpu.get('Hardware Errors', 0) }}</th>
+                <th {% if gpu.get( 'temp', 0)> 90 %}class="danger"{% endif %}>{{ gpu.get('temp', 0) }}</th>
+                <th>{{ gpu.get('Fan Percent', 0) }}%</th>
+                <th>{{ gpu.get('GPU Clock', 0) }}/{{ gpu.get('Memory Clock', 0) }}</th>
+              </tr>
+              {% endfor %}
+              <tr>
+                <th colspan="8">
+                  <small>{{ _("Running PPAgent") }} v{{ stat.get('v', '0.2') }}</small>&nbsp; 
+                  {% if worker['status_version'] < config[ 'latest_ppagent'] %} 
+                  {# Notice about out of date ppagent #} 
+                  <a href="https://github.com/icook/ppagent#upgrade">
+                    <small style="color:#FFD600;">{{ _("Newer version available here") }}.</small>
+                  </a>
+                  {% endif %}
+                </th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+{% for payout_currency, data in earning_summary.iteritems() %}
+<h3>{{ payout_currency.name }} {{ _("Unpaid Credit Summary") }}</h3>
+<div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <tr>
+      <th>{{ _("Currency") }}</th>
+      <th>{{ _("Total Pending") }}</th>
+      <th>{{ _("Immature") }}</th>
+      <th>{{ _("Unconverted") }}</th>
+      <th>{{ _("Partially Converted (BTC amount)") }}</th>
+      <th>{{ _("Payable") }}</th>
+    </tr>
+    {% for currency, cdata in data['by_currency'].iteritems() %}
+    <tr>
+      <td>{{ currency }}</td>
+      <td>{{ cdata['total_pending'] | currency }} {{ currency }}</td>
+      <td>{{ cdata['immature'] | currency }} {{ currency }}</td>
+      <td>{% if cdata['convert'] %}{{ cdata['unconverted'] | currency }} {{ currency }}{% else %}N/A{% endif %}</td>
+      <td>{% if cdata['convert'] %}{{ cdata['sold'] | currency }} {{ currency }} ({{ cdata['btc_converted'] | currency }} BTC){% else %}N/A{% endif %}</td>
+      <td>{{ cdata['payable'] | currency }} {{ payout_currency }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="4"></td>
+      <td style="border-top:1px solid #555;">{{ data['sold_btc_total'] | currency }} BTC</td>
+      <td style="border-top:1px solid #555;">{{ data['payable_total'] | currency }} {{ payout_currency }}</td>
+    </tr>
+  </table>
+</div>
+{% endfor %}
+<h2>{{ _("Recent Payouts") }}</h2>
+{% include "payout_table.html" %}
+<a href="/{{ username }}/account">{{ _("View all account transactions") }}</a>
+<h2>{{ _("Recent Unpaid Block Credits") }}</h2>
+{% include "credit_table.html" %}
+<a href="/{{ username }}/aggr_account">{{ _("View all recent credits") }}</a>
+{% endblock %}

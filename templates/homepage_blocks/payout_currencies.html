@@ -1,0 +1,10 @@
+<div class="panel">
+  <div class="panel-heading">{{ _("Current Payout Currencies") }}</div>
+  <div class="panel-body">
+    <ul>
+      {% for c in payout_currencies %}
+      <li>{{ c.name }} ({{ c }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

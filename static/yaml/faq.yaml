@@ -1,0 +1,116 @@
+"What is the payout schedule?":
+    |
+    <p>Payouts are daily at around 6pm GMT</p>
+
+"What are the pool fees?":
+    |
+    <p>Fees are done on a per-port basis</p>
+
+    <p>Our PPLNS ports are generally 1% for a dedicated currency, and 2% for
+    profit switching.</p>
+
+"What are the pool fees?":
+    |
+    <ul>
+    <li>Fees are done on a per-port basis</li>
+    <li>PPLNS ports are generally 1% for a dedicated currency</li>
+    <li>PPLNS ports are generally 2% for profit switching.</li>
+    <li>Miners keep any transaction fees mined into blocks</li>
+    <li>We cover payout transaction fees</li>
+    <li>We pass along all fees incurred from currency exchange, including
+    deposit/withdrawal transaction fees to/from exchanges</li>
+    </ul>
+
+"Do you merge mine Doge/what currencies do you merge mine?":
+    |
+    <p><b>Scrypt coins</b>: Dogecoin (DOGE), Syscoin (SYS), Umbrella LTC (ULTC),
+    Pesetacoin (PTC), Greencoin (GRE), Tacocoin (TCO)
+    </p>
+
+    <p><b>Scrypt-N coins</b>: ZeroVertcoin (ZER/ZVTC), <s>Monoclecoin (MON)</s>
+    (currently disabled) in favor of ZVTC
+    </p>
+
+    <p><b>X11 coins</b>: N/A
+    </p>
+
+"How do I pick which currency I want to be paid out in?":
+    | 
+    <p>Your desired payout currency is automatically determined by the type of
+    address you're mining with. So if you mine with a Bitcoin address as your
+    username, then by default everything you mine will exchanged to Bitcoin and
+    paid out to that address. This can be done since most (almost all) altcoins
+    have a unique address "prefix", which is technically known as the address
+    version. For instance, a Vertcoin address will always start with a "V", 
+    while most Bitcoin addresses start with a "1".</p>
+
+    <p>However, some of the coins versions overlap - such as Urocoin and
+    ULTC, Viacoin and Vertcoin, etc. This means our system can't <i>always</i>
+    automatically determine which you intended. In the future we'll be adding a
+    method to explicitly specify which you want, but for now when there is a
+    conflict we have picked one for the default. So for example: if you mine
+    with a ULTC address all of your earnings will actually be converted to
+    Urocoin. If this isn't what you intended, its not a complete loss, your
+    ULTC address is actually also a valid URO address.
+    </p>
+
+    <p>A complete list of the coin addresses you can mine with may be found
+    on the <a href="http://www.simplemulti.com/">front page</a>
+
+"What if I want to keep X currency, and not have it Auto-Exchanged?":
+    | 
+    Your user settings page allows you to specify a payout address for any
+    currency that you <i>don't</i> want to exchange to the currency of your
+    mining addresses. Also note that some currencies <b>cannot</b> be exchanged
+    for your mining currency and to recieve these currencies you <b>must</b>
+    specify a payout address. These currencies are separated out on your
+    settings page under "Unexchangeable Currencies".
+
+"I have a payout marked 'payout pending' that hasn't been paid out in days. Whats the deal?":
+    |
+    <p>Some currencies have payout minimums. For example, Syscoin requires that a
+    transaction output be no smaller than .05, which means we are completely
+    unable to payout a balance smaller than that.</p>
+
+    <p>The only other currencies (at the moment) which have minimums are
+    BTC (0.0001 minimum), and LTC (0.001 minimum). At some point we'll get
+    these all listed out somewhere so it is easier to navigate.</p>
+
+    <p>Once your balance exceeds the minimum you'll get paid out normally.</p>
+
+"Why does vardiff put my workers at a very high/very low difficulty?":
+    |
+    <p>We run a custom <b>user based</b> vardiff instead of the more traditional
+    <b>worker based</b> vardiff. Most pools run worker based vardiff and
+    target ~20 share submissions per minute from each worker,
+    whereas we target ~35 share submission per minute from each user.
+    </p>
+
+    <p>So if you have only one worker you'll probably notice a lot more
+    share submissions than on other pools, and vardiff will adjust your
+    difficulty down a lot. But if you have many workers you'll notice the
+    opposite.
+    </p>
+
+    <p>
+    This setup is designed to be extremely performant for miners and also reduce
+    the load on our servers, even if mining with a very large mining farm.
+    Since <b>user based</b> vardiff is not the norm, we often have miners who
+    want to set a specific difficulty which works better for their miner
+    (frequently the case with ASICS). If you'd like to do that, read the
+    section on setting a fixed difficulty.
+    </p>
+
+"How do I set a specific difficulty for my miner?":
+    |
+    <p>Configure your miner to use "--diff XXX" as the password</p>
+
+    <p>Most ports have a minimum allowed setting for this value, and if you
+    try something below that value it'll just set it to the minimum.</p>
+
+    <p>Note: this functions as a 'starting difficulty', so on vardiff
+    ports the difficulty will still get adjusted! If you want it to stay fixed
+    you'll need to mine on a fixed diff port. We're working on
+    <a href="https://github.com/simplecrypto/powerpool/issues/76">more powerful
+    configuration options</a> for vardiff, but at the moment they're not available.
+    </p>

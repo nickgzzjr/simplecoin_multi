@@ -1,0 +1,46 @@
+<script>
+$(document).ready(function() {
+  $("#blockTable").tablesorter({
+    textExtraction: function(node) {
+      var attr = $(node).attr('data-sort-value');
+      if (typeof attr !== 'undefined' && attr !== false) {
+        return attr;
+      }
+      return $(node).text();
+    }
+  });
+});
+</script>
+{% if payouts %}
+<div class="table-responsive">
+  <table class="table table-striped table-hover" id="blockTable">
+    <thead>
+      <tr>
+        <th>{{ _("Time") }}</th>
+        <th>{{ _("Amount") }}</th>
+        <th>{{ _("Currency") }}</th>
+        <th>{{ _("TXID") }}</th>
+        <th>{{ _("Status") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for payout in payouts %}
+      <tr>
+        <th data-sort-value="{{ payout.timestamp }}">{{ payout.created_at | human_date_utc }}</th>
+        <th>{{ payout.amount | currency }}</th>
+        <th>{{ payout.currency }}</th>
+        <th>
+          {% if payout.transaction %} {% if payout.currency_obj.tx_explore %}
+          <a href="{{ payout.currency_obj.tx_explore ~ payout.transaction.txid }}">{{ payout.transaction.txid }}</a> {% else %} {{ payout.transaction.txid }} {% endif %} {% else %} {{ "..." }} {% endif %}
+        </th>
+        <th>{{ payout.status }}</th>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center">
+  <h3>{{ _("No payouts for this user yet") }}</h3>
+</div>
+{% endif %}
